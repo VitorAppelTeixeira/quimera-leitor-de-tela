@@ -63,7 +63,4 @@ pip install pyautogui pytesseract pyttsx3 pillow
 
 # Interface gráfica (GUI).
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 694bee1bba615b7b51945fb9f484f23cb8d61ba5
