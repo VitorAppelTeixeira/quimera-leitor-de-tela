@@ -6,6 +6,7 @@ import pyttsx3
 from PIL import Image
 import threading
 import time
+import platform
 
 class LeitorTelaGUI:
     def __init__(self, root):
@@ -29,14 +30,20 @@ class LeitorTelaGUI:
         main_frame = ttk.Frame(self.root, padding="20")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
+        # Configurar grid para centralizar
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+        main_frame.grid_rowconfigure(1, weight=1)
+        main_frame.grid_columnconfigure(0, weight=1)
+        
         # Título
         title_label = ttk.Label(main_frame, text="Configuração Inicial", 
                                font=("Arial", 14, "bold"))
         title_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
         
-        # Frame para os botões
+        # Frame para os botões - centralizado
         button_frame = ttk.Frame(main_frame)
-        button_frame.grid(row=1, column=0, pady=(0, 20))
+        button_frame.grid(row=1, column=0, columnspan=2, pady=(0, 20))
         
         # Botão Ligar
         self.ligar_btn = ttk.Button(button_frame, 
@@ -55,14 +62,42 @@ class LeitorTelaGUI:
         # Label de status
         self.status_label = ttk.Label(main_frame, text="Leitor desligado", 
                                      foreground="gray")
-        self.status_label.grid(row=2, column=0, pady=(10, 0))
+        self.status_label.grid(row=2, column=0, columnspan=2, pady=(10, 0))
         
         # Label de informação
         info_label = ttk.Label(main_frame, 
                               text="O leitor captura e lê o texto da tela a cada 5 segundos",
                               font=("Arial", 9),
                               foreground="gray")
-        info_label.grid(row=3, column=0, pady=(10, 0))
+        info_label.grid(row=3, column=0, columnspan=2, pady=(10, 0))
+    
+    def get_smart_region(self):
+        """Calcula região inteligente evitando navbar e elementos do topo"""
+        largura, altura = pyautogui.size()
+        
+        # Detectar altura da taskbar do Windows
+        taskbar_height = 60  # Padrão
+        try:
+            if platform.system() == "Windows":
+                import ctypes
+                full_h = ctypes.windll.user32.GetSystemMetrics(1)  # SM_CYSCREEN
+                work_h = ctypes.windll.user32.GetSystemMetrics(17)  # SM_CYFULLSCREEN
+                taskbar_height = max(full_h - work_h, 40)
+        except:
+            pass
+        
+        # Área típica de navegador/apps (header, navbar, tabs)
+        top_offset = int(altura * 0.15)  # 15% do topo (navbar, tabs, etc)
+        bottom_offset = taskbar_height + 20  # taskbar + margem
+        side_margin = int(largura * 0.08)  # 8% das laterais (sidebars)
+        
+        # Região final focada no conteúdo
+        x = side_margin
+        y = top_offset
+        w = largura - (2 * side_margin)
+        h = altura - top_offset - bottom_offset
+        
+        return (x, y, w, h)
     
     def inicializar_engine(self):
         """Cria um novo engine TTS completamente limpo"""
@@ -153,14 +188,10 @@ class LeitorTelaGUI:
             return
             
         try:
-            # Pega resolução da tela
-            largura, altura = pyautogui.size()
+            # Usar região inteligente ao invés da região fixa
+            regiao_x, regiao_y, regiao_largura, regiao_altura = self.get_smart_region()
             
-            # Define região central (60% da tela)
-            regiao_x = int(largura * 0.2)
-            regiao_y = int(altura * 0.2)
-            regiao_largura = int(largura * 0.6)
-            regiao_altura = int(altura * 0.6)
+            print(f"Região inteligente: x={regiao_x}, y={regiao_y}, w={regiao_largura}, h={regiao_altura}")
             
             # Captura tela
             imagem = pyautogui.screenshot(region=(regiao_x, regiao_y, regiao_largura, regiao_altura))
