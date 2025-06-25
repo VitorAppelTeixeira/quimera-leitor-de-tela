@@ -33,7 +33,7 @@ Antes de rodar o script, você precisa ter:
 
 1. **Instale o Tesseract**  
    Baixe e instale a versão para Windows:  
-   [[https://github.com/tesseract-ocr/tesseract](https://github.com/tesseract-ocr/tesseract)](https://github.com/UB-Mannheim/tesseract/wiki)
+   https://github.com/UB-Mannheim/tesseract/wiki
 
    Durante a instalação, copie o caminho (geralmente:  
    `C:\Program Files\Tesseract-OCR\tesseract.exe`).
